@@ -12,7 +12,7 @@ A lightweight, cross-platform password generator.
 
 ```bash
 # With install script
-pwdgen --help
+pwdgen --help  # On linux ~/.local/bin/ needs to be set as PATH
 
 # Downloaded executable
 cd path/to/download
