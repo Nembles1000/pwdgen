@@ -49,8 +49,8 @@ mkdir -p "$INSTALL_DIR" || { echo "[fail] Could not create install directory: $I
 
 UNAME_OUT="$(uname -s)"
 case "${UNAME_OUT}" in
-    Linux*)     BINARY_NAME=pwdgen-linux;;
-    Darwin*)    BINARY_NAME=pwdgen-macos;;
+    Linux*)     BINARY_NAME=pwdgen;;
+    Darwin*)    BINARY_NAME=pwdgen-macOS;;
     *)          echo "[fail] Unsupported OS: ${UNAME_OUT}"; exit 1;;
 esac
 
