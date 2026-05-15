@@ -10,7 +10,7 @@ set "RAW_BASE=https://raw.githubusercontent.com/%REPO%"
 set "BINARY_NAME=pwdgen.exe"
 set "PINNED_VERSION="
 
-:: ── argument parsing ──────────────────────────────────────────────────────────
+:: argument parsing
 :parse_args
 if "%~1"=="" goto args_done
 if "%~1"=="--version" (
@@ -27,7 +27,7 @@ echo [fail] Unknown argument: %~1
 exit /b 1
 :args_done
 
-:: ── dependency check ──────────────────────────────────────────────────────────
+:: dependency check
 where curl >nul 2>&1
 if errorlevel 1 (
     echo [fail] 'curl' is required but not found. Please install it first.
@@ -40,7 +40,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-:: ── resolve version ───────────────────────────────────────────────────────────
+:: resolve version
 if not "!PINNED_VERSION!"=="" (
     set "VERSION=!PINNED_VERSION!"
     echo [pwdgen] Using pinned version: !VERSION!
@@ -69,7 +69,7 @@ if "!VERSION!"=="" (
 echo [pwdgen] Latest version: !VERSION!
 :version_done
 
-:: ── resolve install path ──────────────────────────────────────────────────────
+:: resolve install path
 set "INSTALL_DIR=%LOCALAPPDATA%\Programs\pwdgen"
 set "INSTALL_PATH=%INSTALL_DIR%\pwdgen.exe"
 
@@ -83,7 +83,7 @@ if not exist "%INSTALL_DIR%" (
 
 set "DOWNLOAD_URL=%RAW_BASE%/main/bin/!VERSION!/%BINARY_NAME%"
 
-:: ── download ──────────────────────────────────────────────────────────────────
+:: download
 set "TMPFILE=%TEMP%\pwdgen_download.exe"
 
 echo [pwdgen] Downloading %BINARY_NAME% !VERSION!...
@@ -98,7 +98,7 @@ if errorlevel 1 (
 
 echo [  ok  ] Download complete.
 
-:: ── install ───────────────────────────────────────────────────────────────────
+:: install
 copy /Y "%TMPFILE%" "%INSTALL_PATH%" >nul
 if errorlevel 1 (
     echo [fail] Could not copy binary to %INSTALL_PATH%
@@ -109,7 +109,7 @@ if errorlevel 1 (
 del "%TMPFILE%"
 echo [  ok  ] Installed to %INSTALL_PATH%
 
-:: ── PATH check ────────────────────────────────────────────────────────────────
+:: PATH check
 echo %PATH% | findstr /I /C:"%INSTALL_DIR%" >nul 2>&1
 if errorlevel 1 (
     echo [ warn ] %INSTALL_DIR% is not on your PATH.
@@ -117,7 +117,7 @@ if errorlevel 1 (
     echo [ warn ]   Add: %INSTALL_DIR%
 )
 
-:: ── verify ────────────────────────────────────────────────────────────────────
+:: verify
 where pwdgen >nul 2>&1
 if errorlevel 1 (
     echo [ warn ] pwdgen installed but not found in PATH yet.
