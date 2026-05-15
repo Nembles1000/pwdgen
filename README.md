@@ -1,25 +1,22 @@
 # pwdgen - Password Generator
 
-A lightweight, cross-platform password generator written in C++.
+A lightweight, cross-platform password generator.
 
 ## Features
 
-- Generate random passwords of any length
+- Generate random passwords based on user specified settings
 - Cross-platform support (Windows, Linux, macOS)
 - Command-line interface
-- Automatic CI/CD builds for all platforms
 
 ## Usage
 
 ```bash
-# Generate a 16-character password (default)
-./pwdgen
+# With install script
+pwdgen --help
 
-# Generate a 32-character password
-./pwdgen 32
-
-# Generate a 8-character password
-./pwdgen 8
+# Downloaded executable
+cd path/to/download
+./pwdgen --help
 ```
 
 ## License
