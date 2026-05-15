@@ -102,6 +102,7 @@ echo [  ok  ] Download complete.
 
 :: install
 copy /Y "%TMPFILE%" "%INSTALL_PATH%" >nul
+setx PATH "%PATH%;C:\Users\%USERNAME%\AppData\Local\Programs\pwdgen"
 if errorlevel 1 (
     echo [fail] Could not copy binary to %INSTALL_PATH%
     del "%TMPFILE%"
@@ -125,7 +126,7 @@ if errorlevel 1 (
     echo [ warn ] pwdgen installed but not found in PATH yet.
     echo [ warn ] Restart your terminal or add %INSTALL_DIR% to PATH.
 ) else (
-    echo [  ok  ] pwdgen is ready. Try: pwdgen 16
+    echo [  ok  ] pwdgen is ready. Restart your terminal
 )
 
 echo.
