@@ -1,16 +1,15 @@
 @echo off
 :: pwdgen installer for Windows
 :: Usage: install.bat
-::        install.bat --version v1.2.0   (pin a specific version)
+::        install.bat --version vX.Y.Z
 setlocal EnableDelayedExpansion
 
 set "REPO=Nembles1000/pwdgen"
 set "GITHUB_API=https://api.github.com/repos/%REPO%"
-set "RAW_BASE=https://raw.githubusercontent.com/%REPO%"
 set "BINARY_NAME=pwdgen.exe"
 set "PINNED_VERSION="
 
-:: ── argument parsing ──────────────────────────────────────────────────────────
+:: argument parsing
 :parse_args
 if "%~1"=="" goto args_done
 if "%~1"=="--version" (
@@ -27,7 +26,7 @@ echo [fail] Unknown argument: %~1
 exit /b 1
 :args_done
 
-:: ── dependency check ──────────────────────────────────────────────────────────
+:: dependency check
 where curl >nul 2>&1
 if errorlevel 1 (
     echo [fail] 'curl' is required but not found. Please install it first.
@@ -40,7 +39,7 @@ if errorlevel 1 (
     exit /b 1
 )
 
-:: ── resolve version ───────────────────────────────────────────────────────────
+:: resolve version
 if not "!PINNED_VERSION!"=="" (
     set "VERSION=!PINNED_VERSION!"
     echo [pwdgen] Using pinned version: !VERSION!
@@ -49,11 +48,13 @@ if not "!PINNED_VERSION!"=="" (
 
 echo [pwdgen] Fetching latest version from GitHub...
 
-:: Pull tag_name from the releases API using PowerShell JSON parsing
+set "VERSION="
+:: Try to get the latest release tag_name
 for /f "delims=" %%V in ('powershell -NoProfile -Command "try { (Invoke-RestMethod -Uri '%GITHUB_API%/releases/latest').tag_name } catch { '' }"') do (
     set "VERSION=%%V"
 )
 
+:: If still blank, try to get the first tag (latest by list order)
 if "!VERSION!"=="" (
     echo [ warn ] No GitHub release found, checking tags...
     for /f "delims=" %%V in ('powershell -NoProfile -Command "try { (Invoke-RestMethod -Uri '%GITHUB_API%/tags')[0].name } catch { '' }"') do (
@@ -61,15 +62,16 @@ if "!VERSION!"=="" (
     )
 )
 
+:: If still blank, error out
 if "!VERSION!"=="" (
-    echo [ warn ] Could not determine version from GitHub, falling back to v1.0.0
-    set "VERSION=v1.0.0"
+    echo [fail] Could not determine version from GitHub releases or tags. Aborting.
+    exit /b 1
 )
 
 echo [pwdgen] Latest version: !VERSION!
 :version_done
 
-:: ── resolve install path ──────────────────────────────────────────────────────
+:: resolve install path
 set "INSTALL_DIR=%LOCALAPPDATA%\Programs\pwdgen"
 set "INSTALL_PATH=%INSTALL_DIR%\pwdgen.exe"
 
@@ -81,9 +83,9 @@ if not exist "%INSTALL_DIR%" (
     )
 )
 
-set "DOWNLOAD_URL=%RAW_BASE%/main/bin/!VERSION!/%BINARY_NAME%"
+set "DOWNLOAD_URL=https://github.com/%REPO%/releases/download/!VERSION!/%BINARY_NAME%"
 
-:: ── download ──────────────────────────────────────────────────────────────────
+:: download
 set "TMPFILE=%TEMP%\pwdgen_download.exe"
 
 echo [pwdgen] Downloading %BINARY_NAME% !VERSION!...
@@ -91,14 +93,14 @@ echo [pwdgen] Source: !DOWNLOAD_URL!
 
 curl -fsSL -o "%TMPFILE%" "!DOWNLOAD_URL!"
 if errorlevel 1 (
-    echo [fail] Download failed. Check that version !VERSION! exists in the repo.
+    echo [fail] Download failed. Check that version !VERSION! exists in the releases.
     if exist "%TMPFILE%" del "%TMPFILE%"
     exit /b 1
 )
 
 echo [  ok  ] Download complete.
 
-:: ── install ───────────────────────────────────────────────────────────────────
+:: install
 copy /Y "%TMPFILE%" "%INSTALL_PATH%" >nul
 if errorlevel 1 (
     echo [fail] Could not copy binary to %INSTALL_PATH%
@@ -109,7 +111,7 @@ if errorlevel 1 (
 del "%TMPFILE%"
 echo [  ok  ] Installed to %INSTALL_PATH%
 
-:: ── PATH check ────────────────────────────────────────────────────────────────
+:: PATH check
 echo %PATH% | findstr /I /C:"%INSTALL_DIR%" >nul 2>&1
 if errorlevel 1 (
     echo [ warn ] %INSTALL_DIR% is not on your PATH.
@@ -117,7 +119,7 @@ if errorlevel 1 (
     echo [ warn ]   Add: %INSTALL_DIR%
 )
 
-:: ── verify ────────────────────────────────────────────────────────────────────
+:: verify
 where pwdgen >nul 2>&1
 if errorlevel 1 (
     echo [ warn ] pwdgen installed but not found in PATH yet.
